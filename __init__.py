@@ -1,1 +1,1 @@
-import socket_server
+import socket_server as server
