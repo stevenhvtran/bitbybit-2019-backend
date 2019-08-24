@@ -14,7 +14,6 @@ socketio = SocketIO(app, async_mode='eventlet', manage_session=False,
                     cors_allowed_origins='*')
 
 
-
 @socketio.on('text')
 def handle_editing(text):
     # Track statistics
