@@ -1,12 +1,14 @@
 from flask import Flask, session
 from flask_socketio import SocketIO, emit
 from flask_session import Session
+from flask_cors import CORS
 import eventlet
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'not-secret'
 app.config['SESSION_TYPE'] = 'filesystem'
+CORS(app)
 Session(app)
 socketio = SocketIO(app, async_mode='eventlet', manage_session=False)
 eventlet.monkey_patch()
