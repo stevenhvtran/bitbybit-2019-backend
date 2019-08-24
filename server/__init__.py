@@ -99,8 +99,8 @@ def handle_start_session(data):
             session['remaining_time'] = session['remaining_time'] - 120
             eventlet.sleep(120)
         else:
-            eventlet.sleep(session['remaining_time'])
             session['remaining_time'] = 0
+            eventlet.sleep(data['duration'])
 
     if not session['ended']:
         emit('end_session', 'done', broadcast=True)
