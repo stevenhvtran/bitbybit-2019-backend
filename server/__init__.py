@@ -8,6 +8,7 @@ from flask_cors import CORS
 from flask_socketio import SocketIO
 from datetime import datetime
 import requests
+from server import android_compat
 
 socketio = SocketIO()
 
@@ -92,6 +93,9 @@ def handle_start_session(data):
     session['ended'] = False
     session['remaining_time'] = int(data['duration'])
 
+    firebase = android_compat.get_db()
+    firebase.child('start_session').set(data['duration'])
+
     # Keep Socket responsive by sleeping for 2 minutes at a time
     while session['remaining_time'] > 0 and not session['ended']:
         if session['remaining_time'] > 10:
@@ -126,6 +130,9 @@ def handle_break(data):
         return
 
     emit('debug', data, broadcast=True)
+    session['break_issued'] = True
+    db = android_compat.get_db()
+    db.child('break').update(data['duration'])
 
     if session.get('remaining_time') is None:
         session['remaining_time'] = 0
@@ -147,6 +154,19 @@ def handle_debug(data):
     print("DEBUG: ", data)
 
 
+def stream_break_handler(message):
+    if session.get('break_issued') is None or (session.get('break_issued') is not None and session.get('break_issued') is False):
+        duration = message['data']
+        emit('break', {'duration': duration}, broadcast=True)
+
+
+def end_session_handler(message):
+    if session.get('end_issued') is None or (session.get('end_issued') is not None and session.get('end_issued') is False):
+        emit('end_session', 'okay', broadcast=True)
+        session['remaining_time'] = 0
+        session['ended'] = True
+
+
 def create_app():
     """
     Creates the Flask app using an application factory setup
@@ -159,4 +179,7 @@ def create_app():
     CORS(app)
     socketio.init_app(app, async_mode='eventlet', manage_session=False,
                       cors_allowed_origins='*')
+
+    db = android_compat.get_db()
+    db.child('break').stream(stream_break_handler)
     return app
