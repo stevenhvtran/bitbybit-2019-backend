@@ -21,7 +21,7 @@ def log_activity(changed_words):
 @socketio.on('text')
 def handle_editing(text):
     # Track statistics
-    activity = get_activity(text)
+    activity = get_activity(text['text'])
     session['prev_activity'] = activity
     emit('activity', activity, broadcast=True)
 
