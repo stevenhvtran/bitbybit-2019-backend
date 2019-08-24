@@ -21,7 +21,7 @@ def log_activity(changed_words):
 
 @socketio.on('text')
 def handle_editing(data):
-    emit('debug', data)
+    emit('debug', data, broadcast=True)
 
     # Track statistics
     activity = get_activity(data['text'])
@@ -76,9 +76,9 @@ def get_activity(text):
     # Log changed words
     log_activity(changed_words)
 
-    if changed_words >= 110:
+    if changed_words >= 8:
         return 'high'
-    elif changed_words >= 40:
+    elif changed_words >= 3:
         return 'medium'
     elif changed_words > 0:
         return 'low'
@@ -91,13 +91,13 @@ def handle_start_session(data):
     emit('debug', data)
 
     session['ended'] = False
-    session['remaining_time'] = data['duration']
+    session['remaining_time'] = int(data['duration'])
 
     # Keep Socket responsive by sleeping for 2 minutes at a time
     while session['remaining_time'] > 0:
-        if session['remaining_time'] > 120:
-            session['remaining_time'] = session['remaining_time'] - 120
-            eventlet.sleep(120)
+        if session['remaining_time'] > 10:
+            session['remaining_time'] = session['remaining_time'] - 10
+            eventlet.sleep(10)
         else:
             session['remaining_time'] = session['remaining_time'] - data['duration']
             eventlet.sleep(data['duration'])
