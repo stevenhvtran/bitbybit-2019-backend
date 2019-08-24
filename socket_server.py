@@ -65,4 +65,4 @@ def test_disconnect():
 if __name__ == '__main__':
     socketio.run(app)
 
-# gunicorn --worker-class eventlet -w 1 module:app
+# Server is hosted on localhost:5000
