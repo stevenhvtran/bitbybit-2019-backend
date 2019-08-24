@@ -21,6 +21,7 @@ def log_activity(changed_words):
 @socketio.on('text')
 def handle_editing(text):
     # Track statistics
+    print('input: ', text)
     activity = get_activity(text['text'])
     session['prev_activity'] = activity
     emit('activity', activity, broadcast=True)
@@ -88,7 +89,7 @@ def handle_start_session(duration):
     # Keep Socket responsive by sleeping for 2 minutes at a time
     while session['remaining_time'] > 0:
         if session['remaining_time'] > 120:
-            session['remaining_time'] -= 120
+            session['remaining_time'] = session['remaining_time'] - 120
             eventlet.sleep(120)
         else:
             session['remaining_time'] = 0
@@ -106,7 +107,7 @@ def handle_end_session():
 
 @socketio.on('break')
 def handle_break(duration):
-    session['remaining_time'] += duration
+    session['remaining_time'] = session['remaining_time'] + duration
 
 
 @socketio.on('connect')
