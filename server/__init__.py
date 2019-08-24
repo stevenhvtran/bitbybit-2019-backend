@@ -41,6 +41,8 @@ def word_count(text):
 
 def get_activity(text):
     edit_time = datetime.now()
+    if session.get('prev_edit_time') is None:
+        session['prev_edit_time'] = datetime.now()
     prev_edit_time = session['prev_edit_time']
     time_elapsed = (edit_time - prev_edit_time).seconds
 
@@ -108,12 +110,12 @@ def handle_break(duration):
 
 
 @socketio.on('connect')
-def test_connect():
+def connect():
     emit('my response', {'data': 'Connected'})
 
 
 @socketio.on('disconnect')
-def test_disconnect():
+def disconnect():
     print('Client disconnected')
 
 # Server is hosted on localhost:5000
@@ -132,4 +134,3 @@ def create_app():
     socketio.init_app(app, async_mode='eventlet', manage_session=False,
                       cors_allowed_origins='*')
     return app
-
