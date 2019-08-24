@@ -19,10 +19,9 @@ def log_activity(changed_words):
 
 
 @socketio.on('text')
-def handle_editing(text):
+def handle_editing(data):
     # Track statistics
-    print('input: ', text)
-    activity = get_activity(text['text'])
+    activity = get_activity(data['text'])
     session['prev_activity'] = activity
     emit('activity', activity, broadcast=True)
 
@@ -44,6 +43,10 @@ def get_activity(text):
     edit_time = datetime.now()
     if session.get('prev_edit_time') is None:
         session['prev_edit_time'] = datetime.now()
+
+    if session.get('prev_text') is None:
+        session['prev_text'] = ''
+
     prev_edit_time = session['prev_edit_time']
     time_elapsed = (edit_time - prev_edit_time).seconds
 
@@ -81,9 +84,9 @@ def get_activity(text):
 
 
 @socketio.on('start_session')
-def handle_start_session(duration):
+def handle_start_session(data):
     session['ended'] = False
-    session['remaining_time'] = duration
+    session['remaining_time'] = data['duration']
 
     # Keep Socket responsive by sleeping for 2 minutes at a time
     while session['remaining_time'] > 0:
@@ -105,15 +108,13 @@ def handle_end_session():
 
 
 @socketio.on('break')
-def handle_break(duration):
-    session['remaining_time'] = session['remaining_time'] + duration
+def handle_break(data):
+    session['remaining_time'] = session['remaining_time'] + data['duration']
 
 
 @socketio.on('connect')
 def connect():
-    session['prev_edit_time'] = datetime.now()
-    session['prev_text'] = ''
-    session['prev_activity'] = 'none'
+    print('Client Connected')
 
 
 @socketio.on('disconnect')
