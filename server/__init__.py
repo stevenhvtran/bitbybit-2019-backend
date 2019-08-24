@@ -90,25 +90,8 @@ def get_activity(text):
 def handle_start_session(data):
     emit('debug', data, broadcast=True)
 
-    session['ended'] = False
-    session['remaining_time'] = int(data['duration'])
-
     firebase = android_compat.get_db()
     firebase.child('start_session').set(data['duration'])
-
-    # Keep Socket responsive by sleeping for 2 minutes at a time
-    while session['remaining_time'] > 0 and not session['ended']:
-        if session['remaining_time'] > 10:
-            session['remaining_time'] = session['remaining_time'] - 10
-            eventlet.sleep(10)
-        else:
-            remaining_time = session['remaining_time']
-            session['remaining_time'] = 0
-            eventlet.sleep(remaining_time)
-
-    if not session['ended']:
-        session['ended'] = True
-        emit('end_session', 'done', broadcast=True)
 
 
 @socketio.on('end_session')
@@ -119,24 +102,11 @@ def handle_end_session():
 
 @socketio.on('break')
 def handle_break(data):
-    status = session.get('ended')
-    # If status is None we know start_session hasn't been run so return
-    # If status is not None it is a boolean
-    # If status is True then break
-    # If status is False then don't
-    if status is None:
-        return
-    if status is True:
-        return
-
     emit('debug', data, broadcast=True)
+
     session['break_issued'] = True
     db = android_compat.get_db()
     db.child('break').update(data['duration'])
-
-    if session.get('remaining_time') is None:
-        session['remaining_time'] = 0
-    session['remaining_time'] = session['remaining_time'] + data['duration']
 
 
 @socketio.on('connect')
