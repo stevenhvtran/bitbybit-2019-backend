@@ -7,8 +7,15 @@ from flask_session import Session
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from datetime import datetime
+import requests
 
 socketio = SocketIO()
+
+
+def log_activity(changed_words):
+    requests.post('http://note-by-note/activity', json={
+        'changed_words': changed_words
+    })
 
 
 @socketio.on('text')
@@ -57,6 +64,9 @@ def get_activity(text):
     session['prev_text'] = count
     session['prev_edit_time'] = edit_time
 
+    # Log changed words
+    log_activity(changed_words)
+
     if changed_words >= 110:
         return 'high'
     elif changed_words >= 40:
@@ -69,6 +79,7 @@ def get_activity(text):
 
 @socketio.on('start_session')
 def handle_start_session(duration):
+    session['prev_edit_time'] = datetime.now()
     session['ended'] = False
     session['remaining_time'] = duration
 
