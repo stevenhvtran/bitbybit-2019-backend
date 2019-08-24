@@ -6,6 +6,7 @@ from flask_socketio import emit
 from flask_session import Session
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from datetime import datetime
 
 socketio = SocketIO()
 
@@ -13,7 +14,9 @@ socketio = SocketIO()
 @socketio.on('text')
 def handle_editing(text):
     # Track statistics
-    emit('activity', get_activity(text), broadcast=True)
+    activity = get_activity(text)
+    session['prev_activity'] = activity
+    emit('activity', activity, broadcast=True)
 
 
 def word_count(text):
@@ -30,6 +33,16 @@ def word_count(text):
 
 
 def get_activity(text):
+    edit_time = datetime.now()
+    prev_edit_time = session['prev_edit_time']
+    time_elapsed = (edit_time - prev_edit_time).seconds
+
+    # If previous time text difference was examined was in last two minutes,
+    # return previous activity reading
+    if time_elapsed < 120:
+        return session['prev_activity']
+
+    # Count the differences in words
     count = word_count(text)
     prev_count = session['prev_text']
     changed_words = 0
@@ -40,11 +53,13 @@ def get_activity(text):
         else:
             changed_words += count[word]
 
+    # Update the text history
     session['prev_text'] = count
+    session['prev_edit_time'] = edit_time
 
-    if changed_words >= 55:
+    if changed_words >= 110:
         return 'high'
-    elif changed_words >= 20:
+    elif changed_words >= 40:
         return 'medium'
     elif changed_words > 0:
         return 'low'
