@@ -2,17 +2,12 @@ import eventlet
 eventlet.monkey_patch()
 
 from flask import Flask, session
-from flask_socketio import SocketIO, emit
+from flask_socketio import emit
 from flask_session import Session
 from flask_cors import CORS
-
-
-
 from flask_socketio import SocketIO
 
 socketio = SocketIO()
-
-
 
 
 @socketio.on('text')
@@ -21,9 +16,40 @@ def handle_editing(text):
     emit('activity', get_activity(text), broadcast=True)
 
 
+def word_count(text):
+    words = text.split()
+    count = dict()
+
+    for word in words:
+        if word in count.keys():
+            count[word] += 1
+        else:
+            count[word] = 1
+
+    return count
+
+
 def get_activity(text):
-    #TODO: REPLACE
-    return 'low'
+    count = word_count(text)
+    prev_count = session['prev_text']
+    changed_words = 0
+    for word in count.keys():
+        if word in prev_count.keys():
+            if count[word] > prev_count[word]:
+                changed_words += count[word] - prev_count[word]
+        else:
+            changed_words += count[word]
+
+    session['prev_text'] = count
+
+    if changed_words >= 55:
+        return 'high'
+    elif changed_words >= 20:
+        return 'medium'
+    elif changed_words > 0:
+        return 'low'
+    else:
+        return 'none'
 
 
 @socketio.on('start_session')
@@ -41,7 +67,7 @@ def handle_start_session(duration):
             eventlet.sleep(session['remaining_time'])
 
     if not session['ended']:
-        emit('end_session', {'session_done': duration}, broadcast=True)
+        emit('end_session', 'done', broadcast=True)
 
 
 @socketio.on('end_session')
