@@ -1,17 +1,18 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, session
 from flask_socketio import SocketIO, emit
 from flask_session import Session
 from flask_cors import CORS
-import eventlet
-eventlet.monkey_patch()
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'not-secret'
-app.config['SESSION_TYPE'] = 'filesystem'
-Session(app)
-CORS(app)
-socketio = SocketIO(app, async_mode='eventlet', manage_session=False,
-                    cors_allowed_origins='*')
+
+
+from flask_socketio import SocketIO
+
+socketio = SocketIO()
+
+
 
 
 @socketio.on('text')
@@ -71,5 +72,12 @@ def create_app():
     Creates the Flask app using an application factory setup
     :return: The app as a Flask object
     """
-    return socketio.run(app)
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'not-secret'
+    app.config['SESSION_TYPE'] = 'filesystem'
+    Session(app)
+    CORS(app)
+    socketio.init_app(app, async_mode='eventlet', manage_session=False,
+                      cors_allowed_origins='*')
+    return app
 
