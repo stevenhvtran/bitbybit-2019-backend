@@ -20,7 +20,7 @@ def handle_editing(text):
 
 def get_activity(text):
     #TODO: REPLACE
-    return {'activity': 'low'}
+    return 'low'
 
 
 @socketio.on('start_session')
