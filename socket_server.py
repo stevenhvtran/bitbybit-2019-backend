@@ -4,7 +4,6 @@ from flask_session import Session
 from flask_cors import CORS
 import eventlet
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'not-secret'
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -13,7 +12,6 @@ CORS(app)
 socketio = SocketIO(app, async_mode='eventlet', manage_session=False,
                     cors_allowed_origins='*')
 eventlet.monkey_patch()
-
 
 
 @socketio.on('text')
@@ -65,8 +63,13 @@ def test_connect():
 def test_disconnect():
     print('Client disconnected')
 
-
-# if __name__ == '__main__':
-#     socketio.run(app)
-
 # Server is hosted on localhost:5000
+
+
+def create_app():
+    """
+    Creates the Flask app using an application factory setup
+    :return: The app as a Flask object
+    """
+    return socketio.run(app)
+
