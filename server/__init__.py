@@ -88,7 +88,7 @@ def get_activity(text):
 
 @socketio.on('start_session')
 def handle_start_session(data):
-    emit('debug', data)
+    emit('debug', data, broadcast=True)
 
     session['ended'] = False
     session['remaining_time'] = int(data['duration'])
@@ -118,7 +118,7 @@ def handle_break(data):
     if session.get('ended') is None or session.get('ended') is True:
         return
 
-    emit('debug', data)
+    emit('debug', data, broadcast=True)
 
     if session.get('remaining_time') is None:
         session['remaining_time'] = 0
