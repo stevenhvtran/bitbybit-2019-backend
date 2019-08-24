@@ -82,7 +82,6 @@ def get_activity(text):
 
 @socketio.on('start_session')
 def handle_start_session(duration):
-    session['prev_edit_time'] = datetime.now()
     session['ended'] = False
     session['remaining_time'] = duration
 
@@ -112,7 +111,9 @@ def handle_break(duration):
 
 @socketio.on('connect')
 def connect():
-    emit('my response', {'data': 'Connected'})
+    session['prev_edit_time'] = datetime.now()
+    session['prev_text'] = ''
+    session['prev_activity'] = 'none'
 
 
 @socketio.on('disconnect')
