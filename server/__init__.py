@@ -21,6 +21,8 @@ def log_activity(changed_words):
 
 @socketio.on('text')
 def handle_editing(data):
+    emit('debug', data)
+
     # Track statistics
     activity = get_activity(data['text'])
     session['prev_activity'] = activity
@@ -86,6 +88,8 @@ def get_activity(text):
 
 @socketio.on('start_session')
 def handle_start_session(data):
+    emit('debug', data)
+
     session['ended'] = False
     session['remaining_time'] = data['duration']
 
@@ -110,6 +114,10 @@ def handle_end_session():
 
 @socketio.on('break')
 def handle_break(data):
+    emit('debug', data)
+
+    if session.get('remaining_time') is None:
+        session['remaining_time'] = 0
     session['remaining_time'] = session['remaining_time'] + data['duration']
 
 
