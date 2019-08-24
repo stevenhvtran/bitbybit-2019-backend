@@ -45,7 +45,7 @@ def get_activity(text):
         session['prev_edit_time'] = datetime.now()
 
     if session.get('prev_text') is None:
-        session['prev_text'] = ''
+        session['prev_text'] = {}
 
     prev_edit_time = session['prev_edit_time']
     time_elapsed = (edit_time - prev_edit_time).seconds
