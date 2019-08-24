@@ -94,13 +94,14 @@ def handle_start_session(data):
     session['remaining_time'] = int(data['duration'])
 
     # Keep Socket responsive by sleeping for 2 minutes at a time
-    while session['remaining_time'] > 0:
+    while session['remaining_time'] > 0 and not session['ended']:
         if session['remaining_time'] > 10:
             session['remaining_time'] = session['remaining_time'] - 10
             eventlet.sleep(10)
         else:
-            session['remaining_time'] = session['remaining_time'] - data['duration']
-            eventlet.sleep(data['duration'])
+            remaining_time = session['remaining_time']
+            session['remaining_time'] = 0
+            eventlet.sleep(remaining_time)
 
     if not session['ended']:
         session['ended'] = True
