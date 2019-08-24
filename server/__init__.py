@@ -157,7 +157,8 @@ def handle_debug(data):
 def stream_break_handler(message):
     if session.get('break_issued') is None or (session.get('break_issued') is not None and session.get('break_issued') is False):
         duration = message['data']
-        emit('break', {'duration': duration}, broadcast=True)
+        if duration > 0:
+            emit('break', {'duration': duration}, broadcast=True)
 
 
 def end_session_handler(message):
