@@ -99,10 +99,11 @@ def handle_start_session(data):
             session['remaining_time'] = session['remaining_time'] - 120
             eventlet.sleep(120)
         else:
-            session['remaining_time'] = 0
+            session['remaining_time'] = session['remaining_time'] - data['duration']
             eventlet.sleep(data['duration'])
 
     if not session['ended']:
+        session['ended'] = True
         emit('end_session', 'done', broadcast=True)
 
 
@@ -114,6 +115,9 @@ def handle_end_session():
 
 @socketio.on('break')
 def handle_break(data):
+    if session.get('ended') is None or session.get('ended') is True:
+        return
+
     emit('debug', data)
 
     if session.get('remaining_time') is None:
