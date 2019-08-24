@@ -135,7 +135,10 @@ def connect():
 def disconnect():
     print('Client disconnected')
 
-# Server is hosted on localhost:5000
+
+@socketio.on('debug')
+def handle_debug(data):
+    print("DEBUG: ", data)
 
 
 def create_app():
