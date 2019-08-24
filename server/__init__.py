@@ -115,7 +115,14 @@ def handle_end_session():
 
 @socketio.on('break')
 def handle_break(data):
-    if session.get('ended') is None or session.get('ended') is True:
+    status = session.get('ended')
+    # If status is None we know start_session hasn't been run so return
+    # If status is not None it is a boolean
+    # If status is True then break
+    # If status is False then don't
+    if status is None:
+        return
+    if status is True:
         return
 
     emit('debug', data, broadcast=True)
