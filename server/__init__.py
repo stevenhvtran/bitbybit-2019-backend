@@ -54,7 +54,7 @@ def get_activity(text):
 
     # If previous time text difference was examined was in last two minutes,
     # return previous activity reading
-    if time_elapsed < 120:
+    if time_elapsed < 10:
         return session['prev_activity']
 
     # Count the differences in words
