@@ -13,10 +13,9 @@ socketio = SocketIO()
 
 
 def log_activity(changed_words):
-    # requests.post('http://note-by-note/activity', json={
-    #     'changed_words': changed_words
-    # })
-    pass
+    requests.post('http://note-by-note.herokuapp.com/activity', json={
+        'changed_words': changed_words
+    })
 
 
 @socketio.on('text')
