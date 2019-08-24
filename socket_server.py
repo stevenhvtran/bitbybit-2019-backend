@@ -8,10 +8,12 @@ import eventlet
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'not-secret'
 app.config['SESSION_TYPE'] = 'filesystem'
-CORS(app)
 Session(app)
-socketio = SocketIO(app, async_mode='eventlet', manage_session=False)
+CORS(app)
+socketio = SocketIO(app, async_mode='eventlet', manage_session=False,
+                    cors_allowed_origins='*')
 eventlet.monkey_patch()
+
 
 
 @socketio.on('text')
