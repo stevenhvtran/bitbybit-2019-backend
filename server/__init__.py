@@ -28,19 +28,19 @@ def handle_editing(data):
     session['prev_activity'] = activity
     emit('activity', activity, broadcast=True)
 
-    # db = android_compat.get_db()
-    # current_break = session.get('current_break')
-    # current_end = session.get('current_end')
-    #
-    # new_break = db.child('break').get().val()
-    # if new_break != current_break:
-    #     session['current_break'] = new_break
-    #     emit('break', {'duration': new_break}, broadcast=True)
-    #
-    # new_end = db.child('break').get().val()
-    # if new_end != current_end:
-    #     session['current_end'] = new_end
-    #     emit('end_session', broadcast=True)
+    db = android_compat.get_db()
+    current_break = session.get('current_break')
+    current_end = session.get('current_end')
+
+    new_break = db.child('break').get().val()
+    if new_break != current_break and new_break:
+        session['current_break'] = new_break
+        emit('break', {'duration': new_break}, broadcast=True)
+
+    new_end = db.child('end_session').get().val()
+    if new_end != current_end and new_end:
+        session['current_end'] = new_end
+        emit('end_session', broadcast=True)
 
 
 def word_count(text):
