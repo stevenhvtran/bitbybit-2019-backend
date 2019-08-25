@@ -114,14 +114,14 @@ def connect():
     db = android_compat.get_db()
     # db.child('break').stream(stream_break_handler)
     # db.child('end_session').stream(end_session_handler)
-    current_break = db.child('break').get()
-    current_end = db.child('end_session').get()
+    current_break = db.child('break').get().val()
+    current_end = db.child('end_session').get().val()
     while True:
-        new_break = db.child('break').get()
+        new_break = db.child('break').get().val()
         if new_break != current_break:
             emit('break', {'duration': new_break['duration']}, broadcast=True)
 
-        new_end = db.child('break').get()
+        new_end = db.child('break').get().val()
         if new_end != current_end:
             emit('end_session', broadcast=True)
         eventlet.sleep(1)
@@ -137,18 +137,18 @@ def handle_debug(data):
     print("DEBUG: ", data)
 
 
-def stream_break_handler(message):
-    duration = message['data']
-    if duration > 0:
-        emit('break', {'duration': duration}, broadcast=True)
-
-
-def end_session_handler(message):
-    emit('end_session', 'okay', broadcast=True)
-    with open('hack.txt', 'w') as f:
-        f.write('GO')
-    session['remaining_time'] = 0
-    session['ended'] = True
+# def stream_break_handler(message):
+#     duration = message['data']
+#     if duration > 0:
+#         emit('break', {'duration': duration}, broadcast=True)
+#
+#
+# def end_session_handler(message):
+#     emit('end_session', 'okay', broadcast=True)
+#     with open('hack.txt', 'w') as f:
+#         f.write('GO')
+#     session['remaining_time'] = 0
+#     session['ended'] = True
 
 
 def create_app():
