@@ -151,9 +151,10 @@ def create_app():
     socketio.init_app(app, async_mode='eventlet', manage_session=False,
                       cors_allowed_origins='*')
 
-    db = android_compat.get_db()
-    db.child('break').stream(stream_break_handler)
-    db.child('end_session').stream(end_session_handler)
-    session['db'] = db
+    with app.app_context():
+        db = android_compat.get_db()
+        db.child('break').stream(stream_break_handler)
+        db.child('end_session').stream(end_session_handler)
+        session['db'] = db
 
     return app
