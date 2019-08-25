@@ -28,6 +28,20 @@ def handle_editing(data):
     session['prev_activity'] = activity
     emit('activity', activity, broadcast=True)
 
+    db = android_compat.get_db()
+    current_break = session.get('current_break')
+    current_end = session.get('current_end')
+
+    new_break = db.child('break').get().val()
+    if new_break != current_break:
+        session['current_break'] = new_break
+        emit('break', {'duration': new_break['duration']}, broadcast=True)
+
+    new_end = db.child('break').get().val()
+    if new_end != current_end:
+        session['current_end'] = new_end
+        emit('end_session', broadcast=True)
+
 
 def word_count(text):
     words = text.split()
@@ -111,20 +125,7 @@ def handle_break(data):
 
 @socketio.on('connect')
 def connect():
-    db = android_compat.get_db()
-    # db.child('break').stream(stream_break_handler)
-    # db.child('end_session').stream(end_session_handler)
-    current_break = db.child('break').get().val()
-    current_end = db.child('end_session').get().val()
-    while True:
-        new_break = db.child('break').get().val()
-        if new_break != current_break:
-            emit('break', {'duration': new_break['duration']}, broadcast=True)
-
-        new_end = db.child('break').get().val()
-        if new_end != current_end:
-            emit('end_session', broadcast=True)
-        eventlet.sleep(1)
+    print('Client connected')
 
 
 @socketio.on('disconnect')
