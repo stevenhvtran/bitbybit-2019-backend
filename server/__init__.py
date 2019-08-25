@@ -35,7 +35,7 @@ def handle_editing(data):
     new_break = db.child('break').get().val()
     if new_break != current_break:
         session['current_break'] = new_break
-        emit('break', {'duration': new_break['duration']}, broadcast=True)
+        emit('break', {'duration': new_break}, broadcast=True)
 
     new_end = db.child('break').get().val()
     if new_end != current_end:
