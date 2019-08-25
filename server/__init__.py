@@ -155,6 +155,5 @@ def create_app():
         db = android_compat.get_db()
         db.child('break').stream(stream_break_handler)
         db.child('end_session').stream(end_session_handler)
-        session['db'] = db
 
     return app
